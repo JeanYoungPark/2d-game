@@ -5,9 +5,7 @@ export const dialogueData = {
       I also like React and Php. Anyway regardless of the language, I just like programming.
       Here is my <a href="https://github.com/JeanYoungPark" target="_blank">Github</a>!`,
     "cs-degree": `This is my CS degree. I hung it on the wall because I'm proud of it. It was a very theoretical degree but I think it gave me a good foundation.`,
-    "sofa-table": `That's my sofa. I like to relax here and watch YouTube.
-    I also make game programming tutorials on YouTube. Go sub to <a href="https://youtube.com/@jslegenddev" target="_blank">my channel</a>! (If you like the content)
-    You'll learn how I built this portfolio you're currently playing through!`,
+    "sofa-table": `I'm gonna explain about this game project in this comfort sofa. Check my <a href="https://velog.io/@jjing9/kaboom%EC%9D%B4%EB%9E%80" target="_blank">Velog</a>.`,
     tv: `That's my TV. I've been watching tech youtubers a lot recently like :
      <a href="https://www.youtube.com/@freecodecamp" target="_blank">freecodecamp</a>, <a href="https://www.youtube.com/@codingapple" target="_blank">코딩애플</a>,
     <a href="https://www.youtube.com/@nomadcoders" target="_blank">nomadcoders</a> and <a href="https://www.youtube.com/@devbadak" target="_blank">개발바닥</a>!`,
