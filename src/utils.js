@@ -26,7 +26,7 @@ export function displayDialogue(text, onDisplayEnd) {
         clearInterval(intervalRef);
         closeBtn.removeEventListener("click", onCloseBtnClick);
     }
-    console.log(11);
+
     closeBtn.addEventListener("click", onCloseBtnClick);
 }
 
