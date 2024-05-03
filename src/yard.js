@@ -28,6 +28,16 @@ export const loadYardScene = () => {
             "player",
         ]);
 
+        player.add([
+            k.sprite("spritesheet", { anim: "idle-sword" }),
+            k.pos(player.pos.x - 10, player.pos.y - 5),
+            k.scale(0.5),
+            {
+                layer: "objects",
+                tag: "sword",
+            },
+        ]);
+
         for (const layer of layers) {
             if (layer.name === "boundaries") {
                 for (const boundary of layer.objects) {
@@ -134,6 +144,12 @@ export const loadYardScene = () => {
             }
 
             player.play("idle-side");
+        });
+
+        k.onKeyPress("alt", () => {
+            console.log(player.getCollisions());
+            // console.log(player.children[0].play("sword-side"));
+            // player.play("sword-side");
         });
     });
 };
