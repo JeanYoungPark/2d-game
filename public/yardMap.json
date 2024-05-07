@@ -67,7 +67,7 @@
         {
          "draworder":"topdown",
          "id":3,
-         "name":"spawnpoint",
+         "name":"spawnpoints",
          "objects":[
                 {
                  "height":0,
@@ -308,7 +308,7 @@
          "y":0
         }],
  "nextlayerid":7,
- "nextobjectid":24,
+ "nextobjectid":27,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
