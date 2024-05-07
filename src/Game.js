@@ -6,6 +6,8 @@ export class Game {
     constructor() {
         this.k = k;
         this.player = null;
+        this.frog = null;
+        this.slime = null;
 
         this.k.loadSprite("spritesheet", "./spritesheet.png", {
             sliceX: 39,
@@ -19,6 +21,8 @@ export class Game {
                 "walk-up": { from: 1014, to: 1017, loop: true, speed: 8 },
                 "no-idle": 14,
                 "sword-side": { from: 1010, to: 1013, loop: false, speed: 8 },
+                frog: { from: 788, to: 789, loop: true, speed: 4 },
+                slime: { from: 858, to: 859, loop: true, speed: 4 },
             },
         });
     }
@@ -47,6 +51,30 @@ export class Game {
                 isInDialogue: false,
             },
             "player",
+        ]);
+    }
+
+    monsterSetup() {
+        this.frog = this.k.make([
+            this.k.sprite("spritesheet", { anim: "frog" }),
+            this.k.health(4),
+            this.k.pos(),
+            this.k.area(),
+            this.k.body({ isStatic: true }),
+            this.k.anchor("center"),
+            this.k.scale(scaleFactor),
+            "frog",
+        ]);
+
+        this.slime = this.k.make([
+            this.k.sprite("spritesheet", { anim: "slime" }),
+            this.k.health(4),
+            this.k.pos(),
+            this.k.area(),
+            this.k.body({ isStatic: true }),
+            this.k.anchor("center"),
+            this.k.scale(scaleFactor),
+            "slime",
         ]);
     }
 
@@ -80,6 +108,21 @@ export class Game {
                     if (entity.name === "player") {
                         this.player.pos = this.k.vec2((map.pos.x + entity.x) * scaleFactor, (map.pos.y + entity.y) * scaleFactor);
                         this.k.add(this.player);
+                        continue;
+                    }
+                }
+            }
+
+            if (layer.name === "monster") {
+                for (const entity of layer.objects) {
+                    if (entity.name === "frog") {
+                        this.frog.pos = this.k.vec2((map.pos.x + entity.x) * scaleFactor, (map.pos.y + entity.y) * scaleFactor);
+                        this.k.add(this.frog);
+                        continue;
+                    }
+                    if (entity.name === "slime") {
+                        this.slime.pos = this.k.vec2((map.pos.x + entity.x) * scaleFactor, (map.pos.y + entity.y) * scaleFactor);
+                        this.k.add(this.slime);
                         continue;
                     }
                 }

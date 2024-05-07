@@ -13,18 +13,9 @@ export const loadYardScene = () => {
         const map = yard.k.add([yard.k.sprite("yard"), yard.k.pos(0), yard.k.scale(scaleFactor)]);
 
         yard.playerSetup();
+        yard.monsterSetup();
         yard.layerSetup(layers, map);
         yard.scaleSetup();
-
-        const sword = yard.player.add([
-            yard.k.sprite("spritesheet", { anim: "no-idle" }),
-            yard.k.pos(),
-            yard.k.scale(0.5),
-            yard.k.area(),
-            {
-                layer: "objects",
-            },
-        ]);
 
         yard.k.onUpdate(() => {
             yard.k.camPos(yard.player.pos.x, yard.player.pos.y + 100);
@@ -37,6 +28,17 @@ export const loadYardScene = () => {
         yard.k.onMouseRelease(() => {
             yard.handleCommonMouseRelease();
         });
+
+        // 검 휘두르는 액션
+        const sword = yard.player.add([
+            yard.k.sprite("spritesheet", { anim: "no-idle" }),
+            yard.k.pos(),
+            yard.k.scale(0.5),
+            yard.k.area(),
+            {
+                layer: "objects",
+            },
+        ]);
 
         yard.k.onKeyPress("z", () => {
             if (yard.player.direction === "left") {
