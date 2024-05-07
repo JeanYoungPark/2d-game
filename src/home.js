@@ -1,26 +1,28 @@
+import { Game } from "./Game";
 import { dialogueData, scaleFactor } from "./constants";
-import { k } from "./kaboomCtx";
 import { displayDialogue, setCamScale } from "./utils";
 
 export const loadHomeScene = () => {
-    k.scene("home", async () => {
-        k.loadSprite("map", "./map.png");
-        k.setBackground(k.Color.fromHex("#311047"));
+    const home = new Game();
+
+    home.k.scene("home", async () => {
+        home.k.loadSprite("map", "./map.png");
+        home.k.setBackground(home.k.Color.fromHex("#311047"));
         const mapData = await (await fetch("./map.json")).json();
 
         const layers = mapData.layers;
 
-        const map = k.add([k.sprite("map"), k.pos(0), k.scale(scaleFactor)]);
+        const map = home.k.add([home.k.sprite("map"), home.k.pos(0), home.k.scale(scaleFactor)]);
 
-        const player = k.make([
-            k.sprite("spritesheet", { anim: "idle-down" }),
-            k.area({
-                shape: new k.Rect(k.vec2(0, 3), 10, 10),
+        home.player = home.k.make([
+            home.k.sprite("spritesheet", { anim: "idle-down" }),
+            home.k.area({
+                shape: new home.k.Rect(home.k.vec2(0, 3), 10, 10),
             }),
-            k.body(),
-            k.anchor("center"),
-            k.pos(),
-            k.scale(scaleFactor),
+            home.k.body(),
+            home.k.anchor("center"),
+            home.k.pos(),
+            home.k.scale(scaleFactor),
             {
                 speed: 250,
                 direction: "down",
@@ -33,11 +35,11 @@ export const loadHomeScene = () => {
             if (layer.name === "boundaries") {
                 for (const boundary of layer.objects) {
                     map.add([
-                        k.area({
-                            shape: new k.Rect(k.vec2(0), boundary.width, boundary.height),
+                        home.k.area({
+                            shape: new home.k.Rect(home.k.vec2(0), boundary.width, boundary.height),
                         }),
-                        k.body({ isStatic: true }),
-                        k.pos(boundary.x, boundary.y),
+                        home.k.body({ isStatic: true }),
+                        home.k.pos(boundary.x, boundary.y),
                         boundary.name,
                     ]);
 
@@ -54,8 +56,8 @@ export const loadHomeScene = () => {
             if (layer.name === "spawnpoints") {
                 for (const entity of layer.objects) {
                     if (entity.name === "player") {
-                        player.pos = k.vec2((map.pos.x + entity.x) * scaleFactor, (map.pos.y + entity.y) * scaleFactor);
-                        k.add(player);
+                        player.pos = home.k.vec2((map.pos.x + entity.x) * scaleFactor, (map.pos.y + entity.y) * scaleFactor);
+                        home.k.add(player);
                         continue;
                     }
                 }
@@ -65,16 +67,16 @@ export const loadHomeScene = () => {
                 for (const entity of layer.objects) {
                     if (entity.name === "exit") {
                         map.add([
-                            k.area({
-                                shape: new k.Rect(k.vec2(0), entity.width, entity.height),
+                            home.k.area({
+                                shape: new home.k.Rect(home.k.vec2(0), entity.width, entity.height),
                             }),
-                            k.body({ isStatic: true }),
-                            k.pos(entity.x, entity.y),
+                            home.k.body({ isStatic: true }),
+                            home.k.pos(entity.x, entity.y),
                             entity.name,
                         ]);
 
                         player.onCollide(entity.name, () => {
-                            k.go("yard");
+                            home.k.go("yard");
                         });
                     }
                     continue;
@@ -82,20 +84,20 @@ export const loadHomeScene = () => {
             }
         }
 
-        setCamScale(k);
+        setCamScale(home.k);
 
-        k.onResize(() => {
-            setCamScale(k);
+        home.k.onResize(() => {
+            setCamScale(home.k);
         });
 
-        k.onUpdate(() => {
-            k.camPos(player.pos.x, player.pos.y + 100);
+        home.k.onUpdate(() => {
+            home.k.camPos(home.player.pos.x, home.player.pos.y + 100);
         });
 
-        k.onMouseDown((mouseBtn) => {
+        home.k.onMouseDown((mouseBtn) => {
             if (mouseBtn !== "left" || player.isInDialogue) return;
 
-            const worldMousePos = k.toWorld(k.mousePos());
+            const worldMousePos = home.k.toWorld(home.k.mousePos());
             player.moveTo(worldMousePos, player.speed);
 
             const mouseAngle = player.pos.angle(worldMousePos);
@@ -130,7 +132,7 @@ export const loadHomeScene = () => {
             }
         });
 
-        k.onMouseRelease(() => {
+        home.k.onMouseRelease(() => {
             if (player.direction === "down") {
                 player.play("idle-down");
                 return;

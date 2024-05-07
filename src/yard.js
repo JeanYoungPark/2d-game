@@ -1,40 +1,43 @@
+import { Game } from "./Game";
 import { scaleFactor } from "./constants";
-import { k } from "./kaboomCtx";
 import { setCamScale } from "./utils";
 
 export const loadYardScene = () => {
-    k.scene("yard", async () => {
-        k.loadSprite("yard", "./yardMap.png");
-        k.setBackground(k.Color.fromHex("#424E1E"));
+    const yard = new Game();
+
+    yard.k.scene("yard", async () => {
+        yard.k.loadSprite("yard", "./yardMap.png");
+        yard.k.setBackground(yard.k.Color.fromHex("#424E1E"));
         const mapData = await (await fetch("./yardMap.json")).json();
         const layers = mapData.layers;
 
-        const map = k.add([k.sprite("yard"), k.pos(0), k.scale(scaleFactor)]);
+        const map = yard.k.add([yard.k.sprite("yard"), yard.k.pos(0), yard.k.scale(scaleFactor)]);
 
-        const player = k.make([
-            k.sprite("spritesheet", { anim: "idle-down" }),
-            k.area({
-                shape: new k.Rect(k.vec2(0, 3), 10, 10),
+        const player = yard.k.make([
+            yard.k.sprite("spritesheet", { anim: "idle-down" }),
+            yard.k.area({
+                shape: new yard.k.Rect(yard.k.vec2(0, 3), 10, 10),
             }),
-            k.body(),
-            k.anchor("center"),
-            k.pos(),
-            k.scale(scaleFactor),
+            yard.k.body(),
+            yard.k.anchor("center"),
+            yard.k.pos(),
+            yard.k.scale(scaleFactor),
             {
                 speed: 250,
                 direction: "down",
                 isInDialogue: false,
+                isSwordVisible: false,
             },
             "player",
         ]);
 
-        player.add([
-            k.sprite("spritesheet", { anim: "idle-sword" }),
-            k.pos(player.pos.x - 10, player.pos.y - 5),
-            k.scale(0.5),
+        const sword = player.add([
+            yard.k.sprite("spritesheet", { anim: "no-idle" }),
+            yard.k.pos(),
+            yard.k.scale(0.5),
+            yard.k.area(),
             {
                 layer: "objects",
-                tag: "sword",
             },
         ]);
 
@@ -42,11 +45,11 @@ export const loadYardScene = () => {
             if (layer.name === "boundaries") {
                 for (const boundary of layer.objects) {
                     map.add([
-                        k.area({
-                            shape: new k.Rect(k.vec2(0), boundary.width, boundary.height),
+                        yard.k.area({
+                            shape: new yard.k.Rect(yard.k.vec2(0), boundary.width, boundary.height),
                         }),
-                        k.body({ isStatic: true }),
-                        k.pos(boundary.x, boundary.y),
+                        yard.k.body({ isStatic: true }),
+                        yard.k.pos(boundary.x, boundary.y),
                         boundary.name,
                     ]);
                 }
@@ -56,8 +59,8 @@ export const loadYardScene = () => {
             if (layer.name === "spawnpoint") {
                 for (const entity of layer.objects) {
                     if (entity.name === "player") {
-                        player.pos = k.vec2((map.pos.x + entity.x) * scaleFactor, (map.pos.y + entity.y) * scaleFactor);
-                        k.add(player);
+                        player.pos = yard.k.vec2((map.pos.x + entity.x) * scaleFactor, (map.pos.y + entity.y) * scaleFactor);
+                        yard.k.add(player);
                         continue;
                     }
                 }
@@ -67,16 +70,16 @@ export const loadYardScene = () => {
                 for (const entity of layer.objects) {
                     if (entity.name === "home") {
                         map.add([
-                            k.area({
-                                shape: new k.Rect(k.vec2(0), entity.width, entity.height),
+                            yard.k.area({
+                                shape: new yard.k.Rect(yard.k.vec2(0), entity.width, entity.height),
                             }),
-                            k.body({ isStatic: true }),
-                            k.pos(entity.x, entity.y),
+                            yard.k.body({ isStatic: true }),
+                            yard.k.pos(entity.x, entity.y),
                             entity.name,
                         ]);
 
                         player.onCollide(entity.name, () => {
-                            k.go("home");
+                            yard.k.go("home");
                         });
                     }
                     continue;
@@ -86,18 +89,18 @@ export const loadYardScene = () => {
 
         setCamScale(k);
 
-        k.onResize(() => {
+        yard.k.onResize(() => {
             setCamScale(k);
         });
 
-        k.onUpdate(() => {
-            k.camPos(player.pos.x, player.pos.y + 100);
+        yard.k.onUpdate(() => {
+            yard.k.camPos(player.pos.x, player.pos.y + 100);
         });
 
-        k.onMouseDown((mouseBtn) => {
+        yard.k.onMouseDown((mouseBtn) => {
             if (mouseBtn !== "left" || player.isInDialogue) return;
 
-            const worldMousePos = k.toWorld(k.mousePos());
+            const worldMousePos = yard.k.toWorld(yard.k.mousePos());
             player.moveTo(worldMousePos, player.speed);
 
             const mouseAngle = player.pos.angle(worldMousePos);
@@ -132,7 +135,7 @@ export const loadYardScene = () => {
             }
         });
 
-        k.onMouseRelease(() => {
+        yard.k.onMouseRelease(() => {
             if (player.direction === "down") {
                 player.play("idle-down");
                 return;
@@ -146,10 +149,22 @@ export const loadYardScene = () => {
             player.play("idle-side");
         });
 
-        k.onKeyPress("alt", () => {
-            console.log(player.getCollisions());
-            // console.log(player.children[0].play("sword-side"));
-            // player.play("sword-side");
+        yard.k.onKeyPress("z", () => {
+            if (player.direction === "left") {
+                sword.pos = yard.k.vec2(-10, -5);
+                sword.flipX = true;
+                sword.play("sword-side");
+            }
+
+            if (player.direction === "right") {
+                sword.pos = yard.k.vec2(3, -5);
+                sword.flipX = false;
+                sword.play("sword-side");
+            }
+        });
+
+        yard.k.onKeyRelease("z", () => {
+            sword.play("no-idle");
         });
     });
 };

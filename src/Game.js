@@ -1,7 +1,7 @@
 import { k } from "./kaboomCtx";
 import { dialogueData, scaleFactor } from "./constants";
 
-class Game {
+export class Game {
     constructor() {
         this.k = k;
         this.player = null;
@@ -16,8 +16,9 @@ class Game {
                 "walk-side": { from: 975, to: 978, loop: true, speed: 8 },
                 "idle-up": 1014,
                 "walk-up": { from: 1014, to: 1017, loop: true, speed: 8 },
-                "idle-sword": 1010,
-                "sword-side": { from: 1010, to: 1013, loop: false, speed: 8 },
+                "no-idle": 14,
+                "sword-right": { from: 1010, to: 1013, loop: false, speed: 8 },
+                "sword-left": { from: 1049, to: 1052, loop: false, speed: 8 },
             },
         });
     }
