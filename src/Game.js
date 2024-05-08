@@ -6,8 +6,10 @@ export class Game {
     constructor() {
         this.k = k;
         this.player = null;
+        this.sword = null;
         this.frog = null;
         this.slime = null;
+        this.enemies = [];
 
         this.k.loadSprite("spritesheet", "./spritesheet.png", {
             sliceX: 39,
@@ -19,10 +21,11 @@ export class Game {
                 "walk-side": { from: 975, to: 978, loop: true, speed: 8 },
                 "idle-up": 1014,
                 "walk-up": { from: 1014, to: 1017, loop: true, speed: 8 },
-                "no-idle": 14,
-                "sword-side": { from: 1010, to: 1013, loop: false, speed: 8 },
-                frog: { from: 788, to: 789, loop: true, speed: 4 },
-                slime: { from: 858, to: 859, loop: true, speed: 4 },
+                "idle-attack-side": 1093,
+                "idle-attack-down": 1092,
+                "idle-attack-up": 1094,
+                "move-frog": { from: 788, to: 789, loop: true, speed: 4 },
+                "move-slime": { from: 858, to: 859, loop: true, speed: 4 },
             },
         });
     }
@@ -49,32 +52,10 @@ export class Game {
                 speed: 250,
                 direction: "down",
                 isInDialogue: false,
+                layer: "object",
             },
+            this.k.state("idle", ["idle", "attack"]),
             "player",
-        ]);
-    }
-
-    monsterSetup() {
-        this.frog = this.k.make([
-            this.k.sprite("spritesheet", { anim: "frog" }),
-            this.k.health(4),
-            this.k.pos(),
-            this.k.area(),
-            this.k.body({ isStatic: true }),
-            this.k.anchor("center"),
-            this.k.scale(scaleFactor),
-            "frog",
-        ]);
-
-        this.slime = this.k.make([
-            this.k.sprite("spritesheet", { anim: "slime" }),
-            this.k.health(4),
-            this.k.pos(),
-            this.k.area(),
-            this.k.body({ isStatic: true }),
-            this.k.anchor("center"),
-            this.k.scale(scaleFactor),
-            "slime",
         ]);
     }
 
@@ -115,16 +96,18 @@ export class Game {
 
             if (layer.name === "monster") {
                 for (const entity of layer.objects) {
-                    if (entity.name === "frog") {
-                        this.frog.pos = this.k.vec2((map.pos.x + entity.x) * scaleFactor, (map.pos.y + entity.y) * scaleFactor);
-                        this.k.add(this.frog);
-                        continue;
-                    }
-                    if (entity.name === "slime") {
-                        this.slime.pos = this.k.vec2((map.pos.x + entity.x) * scaleFactor, (map.pos.y + entity.y) * scaleFactor);
-                        this.k.add(this.slime);
-                        continue;
-                    }
+                    this.enemies.push(
+                        this.k.add([
+                            this.k.sprite("spritesheet", { anim: `move-${entity.name}` }),
+                            this.k.area(),
+                            this.k.pos(this.k.vec2((map.pos.x + entity.x) * scaleFactor, (map.pos.y + entity.y) * scaleFactor)),
+                            this.k.body({ isStatic: true }),
+                            this.k.anchor("center"),
+                            this.k.scale(scaleFactor),
+                            this.k.state("idle", ["idle", "attack", "move"]),
+                            "monster",
+                        ])
+                    );
                 }
             }
 
@@ -212,7 +195,11 @@ export class Game {
         }
     }
 
-    handleCommonMouseRelease() {
+    handleCommonRelease() {
+        if (this.player.state === "attack") {
+            this.player.enterState("idle");
+        }
+
         if (this.player.direction === "down") {
             this.player.play("idle-down");
             return;
@@ -224,5 +211,29 @@ export class Game {
         }
 
         this.player.play("idle-side");
+    }
+
+    handleSwordKeyPress() {
+        this.player.enterState("attack");
+
+        if (this.player.direction === "down") {
+            this.player.play("idle-attack-down");
+            return;
+        }
+
+        if (this.player.direction === "up") {
+            this.player.play("idle-attack-up");
+            return;
+        }
+
+        this.player.play("idle-attack-side");
+    }
+
+    handleCommonCollide() {
+        this.player.onCollide("monster", (e) => {
+            this.player.onStateEnter("attack", () => {
+                k.destroy(e);
+            });
+        });
     }
 }

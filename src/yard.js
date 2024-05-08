@@ -13,7 +13,6 @@ export const loadYardScene = () => {
         const map = yard.k.add([yard.k.sprite("yard"), yard.k.pos(0), yard.k.scale(scaleFactor)]);
 
         yard.playerSetup();
-        yard.monsterSetup();
         yard.layerSetup(layers, map);
         yard.scaleSetup();
 
@@ -26,36 +25,17 @@ export const loadYardScene = () => {
         });
 
         yard.k.onMouseRelease(() => {
-            yard.handleCommonMouseRelease();
+            yard.handleCommonRelease();
         });
 
-        // 검 휘두르는 액션
-        const sword = yard.player.add([
-            yard.k.sprite("spritesheet", { anim: "no-idle" }),
-            yard.k.pos(),
-            yard.k.scale(0.5),
-            yard.k.area(),
-            {
-                layer: "objects",
-            },
-        ]);
-
         yard.k.onKeyPress("z", () => {
-            if (yard.player.direction === "left") {
-                sword.pos = yard.k.vec2(-10, -5);
-                sword.flipX = true;
-                sword.play("sword-side");
-            }
-
-            if (yard.player.direction === "right") {
-                sword.pos = yard.k.vec2(3, -5);
-                sword.flipX = false;
-                sword.play("sword-side");
-            }
+            yard.handleSwordKeyPress();
         });
 
         yard.k.onKeyRelease("z", () => {
-            sword.play("no-idle");
+            yard.handleCommonRelease();
         });
+
+        yard.handleCommonCollide();
     });
 };

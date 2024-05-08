@@ -66,29 +66,6 @@
         }, 
         {
          "draworder":"topdown",
-         "id":3,
-         "name":"spawnpoints",
-         "objects":[
-                {
-                 "height":0,
-                 "id":23,
-                 "name":"player",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":310.5,
-                 "y":172.5
-                }],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
          "id":5,
          "name":"boundaries",
          "objects":[
@@ -247,26 +224,103 @@
                  "y":81.5
                 }, 
                 {
-                 "height":16,
-                 "id":18,
-                 "name":"npc",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":14,
-                 "x":144.5,
-                 "y":79.5
-                }, 
-                {
                  "height":14,
                  "id":19,
                  "name":"fire",
                  "rotation":0,
                  "type":"",
-                 "visible":true,
+                 "visible":false,
                  "width":16,
                  "x":128,
                  "y":80.5
+                }, 
+                {
+                 "height":16,
+                 "id":35,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":112,
+                 "x":64,
+                 "y":159.666666666667
+                }, 
+                {
+                 "height":16.6666666666667,
+                 "id":36,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":47.6666666666667,
+                 "x":176.333333333333,
+                 "y":128
+                }, 
+                {
+                 "height":16,
+                 "id":37,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":144.666666666667,
+                 "x":223.666666666667,
+                 "y":191.666666666667
+                }, 
+                {
+                 "height":16.6666666666667,
+                 "id":38,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":48,
+                 "x":320.333333333333,
+                 "y":174.666666666667
+                }, 
+                {
+                 "height":11.6666666666667,
+                 "id":40,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":48,
+                 "x":320,
+                 "y":148
+                }, 
+                {
+                 "height":6.33333333333331,
+                 "id":41,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":13.3333333333334,
+                 "x":336.666666666667,
+                 "y":144
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":8,
+         "name":"npc",
+         "objects":[
+                {
+                 "height":16,
+                 "id":32,
+                 "name":"npc",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":14,
+                 "x":146.666666666667,
+                 "y":82
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -300,6 +354,40 @@
                  "width":14,
                  "x":85,
                  "y":133.5
+                }, 
+                {
+                 "height":13.75,
+                 "id":34,
+                 "name":"frog",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":15.375,
+                 "x":240.25,
+                 "y":82.125
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":3,
+         "name":"spawnpoints",
+         "objects":[
+                {
+                 "height":0,
+                 "id":23,
+                 "name":"player",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":310.5,
+                 "y":172.5
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -329,8 +417,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":8,
- "nextobjectid":32,
+ "nextlayerid":9,
+ "nextobjectid":42,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
