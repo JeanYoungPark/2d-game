@@ -7,9 +7,7 @@ export class Game {
         this.k = k;
         this.player = null;
         this.sword = null;
-        this.frog = null;
-        this.slime = null;
-        this.enemies = [];
+        this.frogs = [];
 
         this.k.loadSprite("spritesheet", "./spritesheet.png", {
             sliceX: 39,
@@ -24,8 +22,13 @@ export class Game {
                 "idle-attack-side": 1093,
                 "idle-attack-down": 1092,
                 "idle-attack-up": 1094,
-                "move-frog": { from: 788, to: 789, loop: true, speed: 4 },
-                "move-slime": { from: 858, to: 859, loop: true, speed: 4 },
+                "walk-down-frog": { from: 788, to: 789, loop: true, speed: 4 },
+                "walk-side-frog": { from: 790, to: 791, loop: true, speed: 4 },
+                "walk-up-frog": { from: 827, to: 828, loop: true, speed: 4 },
+                "walk-down-slime": { from: 858, to: 859, loop: true, speed: 4 },
+                "walk-side-slime": { from: 860, to: 861, loop: true, speed: 4 },
+                "walk-up-slime": { from: 897, to: 898, loop: true, speed: 4 },
+                "monster-attack-side": { from: 1010, to: 1013, loop: true, speed: 8 },
             },
         });
     }
@@ -94,20 +97,43 @@ export class Game {
                 }
             }
 
-            if (layer.name === "monster") {
+            if (layer.name === "frogs") {
                 for (const entity of layer.objects) {
-                    this.enemies.push(
-                        this.k.add([
-                            this.k.sprite("spritesheet", { anim: `move-${entity.name}` }),
-                            this.k.area(),
-                            this.k.pos(this.k.vec2((map.pos.x + entity.x) * scaleFactor, (map.pos.y + entity.y) * scaleFactor)),
-                            this.k.body({ isStatic: true }),
-                            this.k.anchor("center"),
-                            this.k.scale(scaleFactor),
-                            this.k.state("idle", ["idle", "attack", "move"]),
-                            "monster",
-                        ])
-                    );
+                    const enemy = this.k.add([
+                        this.k.sprite("spritesheet", { anim: `walk-down-frog` }),
+                        this.k.area(),
+                        this.k.pos(this.k.vec2((map.pos.x + entity.x) * scaleFactor, (map.pos.y + entity.y) * scaleFactor)),
+                        this.k.body(),
+                        this.k.anchor("center"),
+                        this.k.scale(scaleFactor),
+                        this.k.state("idle", ["idle", "attack", "move"]),
+                        "frogs",
+                        {
+                            direction: "down",
+                            layer: "object",
+                        },
+                    ]);
+
+                    this.frogs.push(enemy);
+                }
+            }
+
+            if (layer.name === "slimes") {
+                for (const entity of layer.objects) {
+                    const enemy = this.k.add([
+                        this.k.sprite("spritesheet", { anim: `walk-down-slime` }),
+                        this.k.area(),
+                        this.k.pos(this.k.vec2((map.pos.x + entity.x) * scaleFactor, (map.pos.y + entity.y) * scaleFactor)),
+                        this.k.body(),
+                        this.k.anchor("center"),
+                        this.k.scale(scaleFactor),
+                        this.k.state("idle", ["idle", "attack", "move"]),
+                        "slimes",
+                        {
+                            direction: "down",
+                            layer: "object",
+                        },
+                    ]);
                 }
             }
 
@@ -230,10 +256,85 @@ export class Game {
     }
 
     handleCommonCollide() {
-        this.player.onCollide("monster", (e) => {
+        this.player.onCollide("frogs", (e) => {
             this.player.onStateEnter("attack", () => {
                 k.destroy(e);
             });
         });
+    }
+
+    handleMonsterState() {
+        for (const enemy of this.frogs) {
+            enemy.onStateUpdate("move", () => {
+                this.handleMonsterDir(enemy, "frog");
+
+                let dirX = 1;
+                let dirY = 1;
+
+                if (this.player.pos.x < enemy.pos.x) {
+                    dirX = -1;
+                }
+
+                if (this.player.pos.y < enemy.pos.y) {
+                    dirY = -1;
+                }
+
+                enemy.move(100 * dirX, 100 * dirY);
+            });
+
+            enemy.onStateUpdate("idle", () => {});
+        }
+    }
+
+    handleMonsterMove() {
+        this.k.onUpdate("player", (player) => {
+            for (const enemy of this.frogs) {
+                if (player.pos.dist(enemy.pos) < 90) {
+                    enemy.enterState("move");
+                }
+
+                if (player.pos.dist(enemy.pos) > 120) {
+                    enemy.enterState("idle");
+                }
+
+                if (enemy.pos.dist(player.pos) < 70) {
+                    enemy.enterState("attack");
+                }
+            }
+        });
+    }
+
+    handleMonsterDir(enemy, name) {
+        console.log(enemy);
+        // 플레이어 각도
+        const playerAngle = enemy.pos.angle(this.player.pos);
+        const lowerBound = 50;
+        const upperBound = 125;
+
+        if (playerAngle > lowerBound && playerAngle < upperBound && enemy.curAnim() !== `walk-up-${name}`) {
+            enemy.play(`walk-up-${name}`);
+            enemy.direction = "up";
+            return;
+        }
+
+        if (playerAngle < -lowerBound && playerAngle > -upperBound && enemy.curAnim() !== `walk-down-${name}`) {
+            enemy.play(`walk-down-${name}`);
+            enemy.direction = "down";
+            return;
+        }
+
+        // if (Math.abs(playerAngle) > upperBound) {
+        //     enemy.flipX = false;
+        //     if (enemy.curAnim() !== "walk-side") enemy.play("walk-side");
+        //     enemy.direction = "right";
+        //     return;
+        // }
+
+        // if (Math.abs(playerAngle) < lowerBound) {
+        //     enemy.flipX = true;
+        //     if (enemy.curAnim() !== "walk-side") enemy.play("walk-side");
+        //     enemy.direction = "left";
+        //     return;
+        // }
     }
 }

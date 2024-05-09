@@ -37,5 +37,8 @@ export const loadYardScene = () => {
         });
 
         yard.handleCommonCollide();
+
+        yard.handleMonsterState();
+        yard.handleMonsterMove();
     });
 };

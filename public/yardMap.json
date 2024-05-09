@@ -308,6 +308,61 @@
         }, 
         {
          "draworder":"topdown",
+         "id":9,
+         "name":"frogs",
+         "objects":[
+                {
+                 "height":13.75,
+                 "id":42,
+                 "name":"frog",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":15.375,
+                 "x":242.3125,
+                 "y":84.4583333333333
+                }, 
+                {
+                 "height":13,
+                 "id":43,
+                 "name":"frog",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":14,
+                 "x":87.3333333333333,
+                 "y":135.833333333333
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":10,
+         "name":"slimes",
+         "objects":[
+                {
+                 "height":15.6667,
+                 "id":44,
+                 "name":"slime",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":15,
+                 "x":310.5,
+                 "y":103.16665
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":8,
          "name":"npc",
          "objects":[
@@ -321,50 +376,6 @@
                  "width":14,
                  "x":146.666666666667,
                  "y":82
-                }],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "id":7,
-         "name":"monster",
-         "objects":[
-                {
-                 "height":15.6667,
-                 "id":29,
-                 "name":"slime",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":15,
-                 "x":308.5,
-                 "y":100.833316666667
-                }, 
-                {
-                 "height":13,
-                 "id":30,
-                 "name":"frog",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":14,
-                 "x":85,
-                 "y":133.5
-                }, 
-                {
-                 "height":13.75,
-                 "id":34,
-                 "name":"frog",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":15.375,
-                 "x":240.25,
-                 "y":82.125
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -417,8 +428,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":9,
- "nextobjectid":42,
+ "nextlayerid":11,
+ "nextobjectid":45,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
