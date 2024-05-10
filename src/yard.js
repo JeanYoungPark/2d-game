@@ -21,11 +21,11 @@ export const loadYardScene = () => {
         });
 
         yard.k.onMouseDown((mouseBtn) => {
-            yard.handleCommonMouseDown(mouseBtn);
+            yard.handlePlayerMove(mouseBtn);
         });
 
         yard.k.onMouseRelease(() => {
-            yard.handleCommonRelease();
+            yard.handleReleaseMove();
         });
 
         yard.k.onKeyPress("z", () => {
@@ -33,12 +33,12 @@ export const loadYardScene = () => {
         });
 
         yard.k.onKeyRelease("z", () => {
-            yard.handleCommonRelease();
+            yard.handleReleaseMove();
         });
 
         yard.handleCommonCollide();
 
-        yard.handleMonsterState();
         yard.handleMonsterMove();
+        yard.handleMonsterStateChange();
     });
 };

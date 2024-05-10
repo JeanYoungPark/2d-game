@@ -5,30 +5,34 @@ import { displayDialogue, setCamScale } from "./utils";
 export class Game {
     constructor() {
         this.k = k;
+        this.map = null;
         this.player = null;
-        this.sword = null;
         this.frogs = [];
+        this.slimes = [];
 
         this.k.loadSprite("spritesheet", "./spritesheet.png", {
             sliceX: 39,
             sliceY: 31,
             anims: {
-                "idle-down": 936,
-                "walk-down": { from: 936, to: 939, loop: true, speed: 8 },
-                "idle-side": 975,
-                "walk-side": { from: 975, to: 978, loop: true, speed: 8 },
-                "idle-up": 1014,
-                "walk-up": { from: 1014, to: 1017, loop: true, speed: 8 },
-                "idle-attack-side": 1093,
-                "idle-attack-down": 1092,
-                "idle-attack-up": 1094,
+                "idle-down-player": 936,
+                "idle-side-player": 975,
+                "idle-up-player": 1014,
+                "idle-attack-side-player": 1093,
+                "idle-attack-down-player": 1092,
+                "idle-attack-up-player": 1094,
+                "walk-down-player": { from: 936, to: 939, loop: true, speed: 8 },
+                "walk-side-player": { from: 975, to: 978, loop: true, speed: 8 },
+                "walk-up-player": { from: 1014, to: 1017, loop: true, speed: 8 },
+
+                "idle-monster-attack": 14,
+                "monster-attack-side": { from: 1010, to: 1013, loop: true, speed: 8 },
+
                 "walk-down-frog": { from: 788, to: 789, loop: true, speed: 4 },
                 "walk-side-frog": { from: 790, to: 791, loop: true, speed: 4 },
                 "walk-up-frog": { from: 827, to: 828, loop: true, speed: 4 },
                 "walk-down-slime": { from: 858, to: 859, loop: true, speed: 4 },
                 "walk-side-slime": { from: 860, to: 861, loop: true, speed: 4 },
                 "walk-up-slime": { from: 897, to: 898, loop: true, speed: 4 },
-                "monster-attack-side": { from: 1010, to: 1013, loop: true, speed: 8 },
             },
         });
     }
@@ -43,7 +47,7 @@ export class Game {
 
     playerSetup() {
         this.player = this.k.make([
-            this.k.sprite("spritesheet", { anim: "idle-down" }),
+            this.k.sprite("spritesheet", { anim: "idle-down-player" }),
             this.k.area({
                 shape: new this.k.Rect(this.k.vec2(0, 3), 10, 10),
             }),
@@ -62,12 +66,41 @@ export class Game {
         ]);
     }
 
+    monsterSetup(entity) {
+        const enemy = this.k.add([
+            this.k.sprite("spritesheet", { anim: `walk-down-${entity.name}` }),
+            this.k.pos(this.k.vec2((this.map.pos.x + entity.x) * scaleFactor, (this.map.pos.y + entity.y) * scaleFactor)),
+            this.k.area(),
+            this.k.body(),
+            this.k.anchor("center"),
+            this.k.scale(scaleFactor),
+            this.k.state("idle", ["idle", "attack", "move"]),
+            `${entity.name}s`,
+            {
+                direction: "down",
+                layer: "object",
+            },
+        ]);
+
+        enemy.add([
+            this.k.sprite("spritesheet", { anim: "idle-monster-attack" }),
+            this.k.pos(),
+            this.k.area(),
+            {
+                layer: "objects",
+            },
+            `${entity.name}s`,
+        ]);
+    }
+
     layerSetup(layers, map) {
+        this.map = map;
+
         for (const layer of layers) {
             //  외벽
             if (layer.name === "boundaries") {
                 for (const boundary of layer.objects) {
-                    map.add([
+                    this.map.add([
                         this.k.area({
                             shape: new this.k.Rect(this.k.vec2(0), boundary.width, boundary.height),
                         }),
@@ -90,7 +123,7 @@ export class Game {
             if (layer.name === "spawnpoints") {
                 for (const entity of layer.objects) {
                     if (entity.name === "player") {
-                        this.player.pos = this.k.vec2((map.pos.x + entity.x) * scaleFactor, (map.pos.y + entity.y) * scaleFactor);
+                        this.player.pos = this.k.vec2((this.map.pos.x + entity.x) * scaleFactor, (this.map.pos.y + entity.y) * scaleFactor);
                         this.k.add(this.player);
                         continue;
                     }
@@ -99,41 +132,15 @@ export class Game {
 
             if (layer.name === "frogs") {
                 for (const entity of layer.objects) {
-                    const enemy = this.k.add([
-                        this.k.sprite("spritesheet", { anim: `walk-down-frog` }),
-                        this.k.area(),
-                        this.k.pos(this.k.vec2((map.pos.x + entity.x) * scaleFactor, (map.pos.y + entity.y) * scaleFactor)),
-                        this.k.body(),
-                        this.k.anchor("center"),
-                        this.k.scale(scaleFactor),
-                        this.k.state("idle", ["idle", "attack", "move"]),
-                        "frogs",
-                        {
-                            direction: "down",
-                            layer: "object",
-                        },
-                    ]);
-
-                    this.frogs.push(enemy);
+                    this.monsterSetup(entity);
+                    this.frogs.push(entity); // constructor에서 배열 생성 필요
                 }
             }
 
             if (layer.name === "slimes") {
                 for (const entity of layer.objects) {
-                    const enemy = this.k.add([
-                        this.k.sprite("spritesheet", { anim: `walk-down-slime` }),
-                        this.k.area(),
-                        this.k.pos(this.k.vec2((map.pos.x + entity.x) * scaleFactor, (map.pos.y + entity.y) * scaleFactor)),
-                        this.k.body(),
-                        this.k.anchor("center"),
-                        this.k.scale(scaleFactor),
-                        this.k.state("idle", ["idle", "attack", "move"]),
-                        "slimes",
-                        {
-                            direction: "down",
-                            layer: "object",
-                        },
-                    ]);
+                    this.monsterSetup(entity);
+                    this.slimes.push(entity); // constructor에서 배열 생성 필요
                 }
             }
 
@@ -141,7 +148,7 @@ export class Game {
             if (layer.name === "exit") {
                 for (const entity of layer.objects) {
                     if (entity.name === "exit") {
-                        map.add([
+                        this.map.add([
                             this.k.area({
                                 shape: new this.k.Rect(this.k.vec2(0), entity.width, entity.height),
                             }),
@@ -162,7 +169,7 @@ export class Game {
             if (layer.name === "home") {
                 for (const entity of layer.objects) {
                     if (entity.name === "home") {
-                        map.add([
+                        this.map.add([
                             this.k.area({
                                 shape: new this.k.Rect(this.k.vec2(0), entity.width, entity.height),
                             }),
@@ -181,7 +188,55 @@ export class Game {
         }
     }
 
-    handleCommonMouseDown(mouseBtn) {
+    handleCommonMove(angle, obj) {
+        const lowerBound = 50;
+        const upperBound = 125;
+
+        if (angle > lowerBound && angle < upperBound && this.player.curAnim() !== `walk-up-${obj}`) {
+            this.player.play(`walk-up-${obj}`);
+            this.player.direction = "up";
+            return;
+        }
+
+        if (angle < -lowerBound && angle > -upperBound && this.player.curAnim() !== `walk-down-${obj}`) {
+            this.player.play(`walk-down-${obj}`);
+            this.player.direction = "down";
+            return;
+        }
+
+        if (Math.abs(angle) > upperBound) {
+            this.player.flipX = false;
+            if (this.player.curAnim() !== `walk-side-${obj}`) this.player.play(`walk-side-${obj}`);
+            this.player.direction = "right";
+            return;
+        }
+
+        if (Math.abs(angle) < lowerBound) {
+            this.player.flipX = true;
+            if (this.player.curAnim() !== `walk-side-${obj}`) this.player.play(`walk-side-${obj}`);
+            this.player.direction = "left";
+            return;
+        }
+    }
+
+    handleCommonReleaseMove(obj) {
+        if (this.player.state === "attack") {
+            this.player.enterState("idle");
+        }
+
+        if (this.player.direction === "down") {
+            this.player.play(`idle-down-${obj}`);
+            return;
+        }
+
+        if (this.player.direction === "up") {
+            this.player.play(`idle-up-${obj}`);
+            return;
+        }
+        this.player.play(`idle-side-${obj}`);
+    }
+
+    handlePlayerMove(mouseBtn) {
         // 좌클릭이 아니거나 다이얼로그가 띄어져 있다면 return
         if (mouseBtn !== "left" || this.player.isInDialogue) return;
 
@@ -191,52 +246,13 @@ export class Game {
 
         // 마우스 각도
         const mouseAngle = this.player.pos.angle(worldMousePos);
-        const lowerBound = 50;
-        const upperBound = 125;
-
-        if (mouseAngle > lowerBound && mouseAngle < upperBound && this.player.curAnim() !== "walk-up") {
-            this.player.play("walk-up");
-            this.player.direction = "up";
-            return;
-        }
-
-        if (mouseAngle < -lowerBound && mouseAngle > -upperBound && this.player.curAnim() !== "walk-down") {
-            this.player.play("walk-down");
-            this.player.direction = "down";
-            return;
-        }
-
-        if (Math.abs(mouseAngle) > upperBound) {
-            this.player.flipX = false;
-            if (this.player.curAnim() !== "walk-side") this.player.play("walk-side");
-            this.player.direction = "right";
-            return;
-        }
-
-        if (Math.abs(mouseAngle) < lowerBound) {
-            this.player.flipX = true;
-            if (this.player.curAnim() !== "walk-side") this.player.play("walk-side");
-            this.player.direction = "left";
-            return;
-        }
+        this.handleCommonMove(mouseAngle, "player");
     }
 
-    handleCommonRelease() {
-        if (this.player.state === "attack") {
-            this.player.enterState("idle");
-        }
-
-        if (this.player.direction === "down") {
-            this.player.play("idle-down");
-            return;
-        }
-
-        if (this.player.direction === "up") {
-            this.player.play("idle-up");
-            return;
-        }
-
-        this.player.play("idle-side");
+    handleMonsterMove(enemy) {
+        // 플레이어 각도
+        const playerAngle = enemy.pos.angle(this.player.pos);
+        handleCommonMove(playerAngle, enemy.name);
     }
 
     handleSwordKeyPress() {
@@ -263,10 +279,10 @@ export class Game {
         });
     }
 
-    handleMonsterState() {
+    handleMonsterStateChange() {
         for (const enemy of this.frogs) {
             enemy.onStateUpdate("move", () => {
-                this.handleMonsterDir(enemy, "frog");
+                this.handleMonsterDir(enemy);
 
                 let dirX = 1;
                 let dirY = 1;
@@ -282,59 +298,75 @@ export class Game {
                 enemy.move(100 * dirX, 100 * dirY);
             });
 
-            enemy.onStateUpdate("idle", () => {});
+            enemy.onStateUpdate("idle", () => {
+                enemy.play("walk-down-frog");
+            });
+
+            enemy.onStateEnter("attack", () => {
+                enemy.children[0].play("monster-attack-side");
+            });
+
+            enemy.onStateEnd("attack", () => {
+                enemy.children[0].play("idle-monster-attack");
+            });
+        }
+
+        for (const enemy of this.slimes) {
+            enemy.onStateUpdate("move", () => {
+                this.handleMonsterDir(enemy);
+
+                let dirX = 1;
+                let dirY = 1;
+
+                if (this.player.pos.x < enemy.pos.x) {
+                    dirX = -1;
+                }
+
+                if (this.player.pos.y < enemy.pos.y) {
+                    dirY = -1;
+                }
+
+                enemy.move(100 * dirX, 100 * dirY);
+            });
+
+            enemy.onStateUpdate("idle", () => {
+                enemy.play("walk-down-slime");
+            });
         }
     }
 
-    handleMonsterMove() {
+    handleMonsterState() {
         this.k.onUpdate("player", (player) => {
             for (const enemy of this.frogs) {
+                if (player.pos.dist(enemy.pos) > 90 && player.pos.dist(enemy.pos) < 120) {
+                    if (enemy.state !== "move") enemy.enterState("move");
+                }
+
+                if (player.pos.dist(enemy.pos) > 140) {
+                    if (enemy.state !== "idle") enemy.enterState("idle");
+                }
+
                 if (player.pos.dist(enemy.pos) < 90) {
+                    if (enemy.state !== "attack") {
+                        console.log(player.pos.dist(enemy.pos));
+                        enemy.enterState("attack");
+                    }
+                }
+            }
+
+            for (const enemy of this.slimes) {
+                if (player.pos.dist(enemy.pos) < 120) {
                     enemy.enterState("move");
                 }
 
-                if (player.pos.dist(enemy.pos) > 120) {
+                if (player.pos.dist(enemy.pos) > 140) {
                     enemy.enterState("idle");
                 }
 
-                if (enemy.pos.dist(player.pos) < 70) {
+                if (player.pos.dist(enemy.pos) < 90) {
                     enemy.enterState("attack");
                 }
             }
         });
-    }
-
-    handleMonsterDir(enemy, name) {
-        console.log(enemy);
-        // 플레이어 각도
-        const playerAngle = enemy.pos.angle(this.player.pos);
-        const lowerBound = 50;
-        const upperBound = 125;
-
-        if (playerAngle > lowerBound && playerAngle < upperBound && enemy.curAnim() !== `walk-up-${name}`) {
-            enemy.play(`walk-up-${name}`);
-            enemy.direction = "up";
-            return;
-        }
-
-        if (playerAngle < -lowerBound && playerAngle > -upperBound && enemy.curAnim() !== `walk-down-${name}`) {
-            enemy.play(`walk-down-${name}`);
-            enemy.direction = "down";
-            return;
-        }
-
-        // if (Math.abs(playerAngle) > upperBound) {
-        //     enemy.flipX = false;
-        //     if (enemy.curAnim() !== "walk-side") enemy.play("walk-side");
-        //     enemy.direction = "right";
-        //     return;
-        // }
-
-        // if (Math.abs(playerAngle) < lowerBound) {
-        //     enemy.flipX = true;
-        //     if (enemy.curAnim() !== "walk-side") enemy.play("walk-side");
-        //     enemy.direction = "left";
-        //     return;
-        // }
     }
 }

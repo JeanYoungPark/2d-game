@@ -20,11 +20,11 @@ export const loadHomeScene = () => {
         });
 
         home.k.onMouseDown((mouseBtn) => {
-            home.handleCommonMouseDown(mouseBtn);
+            home.handlePlayerMove(mouseBtn);
         });
 
         home.k.onMouseRelease(() => {
-            home.handleCommonRelease();
+            home.handleReleaseMove();
         });
     });
 };
