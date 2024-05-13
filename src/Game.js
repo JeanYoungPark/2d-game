@@ -188,37 +188,6 @@ export class Game {
         }
     }
 
-    handleCommonMove(angle, obj) {
-        const lowerBound = 50;
-        const upperBound = 125;
-
-        if (angle > lowerBound && angle < upperBound && this.player.curAnim() !== `walk-up-${obj}`) {
-            this.player.play(`walk-up-${obj}`);
-            this.player.direction = "up";
-            return;
-        }
-
-        if (angle < -lowerBound && angle > -upperBound && this.player.curAnim() !== `walk-down-${obj}`) {
-            this.player.play(`walk-down-${obj}`);
-            this.player.direction = "down";
-            return;
-        }
-
-        if (Math.abs(angle) > upperBound) {
-            this.player.flipX = false;
-            if (this.player.curAnim() !== `walk-side-${obj}`) this.player.play(`walk-side-${obj}`);
-            this.player.direction = "right";
-            return;
-        }
-
-        if (Math.abs(angle) < lowerBound) {
-            this.player.flipX = true;
-            if (this.player.curAnim() !== `walk-side-${obj}`) this.player.play(`walk-side-${obj}`);
-            this.player.direction = "left";
-            return;
-        }
-    }
-
     handleCommonReleaseMove(obj) {
         if (this.player.state === "attack") {
             this.player.enterState("idle");
@@ -282,7 +251,7 @@ export class Game {
     handleMonsterStateChange() {
         for (const enemy of this.frogs) {
             enemy.onStateUpdate("move", () => {
-                this.handleMonsterDir(enemy);
+                this.handleMonsterMove(enemy);
 
                 let dirX = 1;
                 let dirY = 1;
@@ -313,7 +282,7 @@ export class Game {
 
         for (const enemy of this.slimes) {
             enemy.onStateUpdate("move", () => {
-                this.handleMonsterDir(enemy);
+                this.handleMonsterMove(enemy);
 
                 let dirX = 1;
                 let dirY = 1;
@@ -336,37 +305,63 @@ export class Game {
     }
 
     handleMonsterState() {
-        this.k.onUpdate("player", (player) => {
+        this.k.onUpdate("player", () => {
             for (const enemy of this.frogs) {
-                if (player.pos.dist(enemy.pos) > 90 && player.pos.dist(enemy.pos) < 120) {
-                    if (enemy.state !== "move") enemy.enterState("move");
-                }
-
-                if (player.pos.dist(enemy.pos) > 140) {
-                    if (enemy.state !== "idle") enemy.enterState("idle");
-                }
-
-                if (player.pos.dist(enemy.pos) < 90) {
-                    if (enemy.state !== "attack") {
-                        console.log(player.pos.dist(enemy.pos));
-                        enemy.enterState("attack");
-                    }
-                }
+                handleMonsterDir(enemy);
             }
 
             for (const enemy of this.slimes) {
-                if (player.pos.dist(enemy.pos) < 120) {
-                    enemy.enterState("move");
-                }
-
-                if (player.pos.dist(enemy.pos) > 140) {
-                    enemy.enterState("idle");
-                }
-
-                if (player.pos.dist(enemy.pos) < 90) {
-                    enemy.enterState("attack");
-                }
+                handleMonsterDir(enemy);
             }
         });
+    }
+
+    // 상하 좌우 공통 움직임 처리
+    handleCommonMove(angle, obj) {
+        const lowerBound = 50;
+        const upperBound = 125;
+
+        if (angle > lowerBound && angle < upperBound && this.player.curAnim() !== `walk-up-${obj}`) {
+            this.player.play(`walk-up-${obj}`);
+            this.player.direction = "up";
+            return;
+        }
+
+        if (angle < -lowerBound && angle > -upperBound && this.player.curAnim() !== `walk-down-${obj}`) {
+            this.player.play(`walk-down-${obj}`);
+            this.player.direction = "down";
+            return;
+        }
+
+        if (Math.abs(angle) > upperBound) {
+            this.player.flipX = false;
+            if (this.player.curAnim() !== `walk-side-${obj}`) this.player.play(`walk-side-${obj}`);
+            this.player.direction = "right";
+            return;
+        }
+
+        if (Math.abs(angle) < lowerBound) {
+            this.player.flipX = true;
+            if (this.player.curAnim() !== `walk-side-${obj}`) this.player.play(`walk-side-${obj}`);
+            this.player.direction = "left";
+            return;
+        }
+    }
+
+    // player 위치에 따라 몬스터 방향 결정
+    handleMonsterDir(enemy) {
+        if (this.player.pos.dist(enemy.pos) > 90 && this.player.pos.dist(enemy.pos) < 120) {
+            if (enemy.state !== "move") enemy.enterState("move");
+        }
+
+        if (this.player.pos.dist(enemy.pos) > 140) {
+            if (enemy.state !== "idle") enemy.enterState("idle");
+        }
+
+        if (this.player.pos.dist(enemy.pos) < 90) {
+            if (enemy.state !== "attack") {
+                enemy.enterState("attack");
+            }
+        }
     }
 }

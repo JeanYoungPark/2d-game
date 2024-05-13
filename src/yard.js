@@ -25,7 +25,7 @@ export const loadYardScene = () => {
         });
 
         yard.k.onMouseRelease(() => {
-            yard.handleReleaseMove();
+            yard.handleCommonReleaseMove("player");
         });
 
         yard.k.onKeyPress("z", () => {
@@ -33,12 +33,10 @@ export const loadYardScene = () => {
         });
 
         yard.k.onKeyRelease("z", () => {
-            yard.handleReleaseMove();
+            yard.handleCommonReleaseMove("player");
         });
 
         yard.handleCommonCollide();
-
-        yard.handleMonsterMove();
         yard.handleMonsterStateChange();
     });
 };
