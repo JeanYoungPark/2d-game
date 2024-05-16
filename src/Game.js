@@ -1,9 +1,12 @@
 import { k } from "./kaboomCtx";
-import { dialogueData, scaleFactor } from "./constants";
-import { displayDialogue, setCamScale } from "./utils";
+import { anims, dialogueData, scaleFactor } from "./constants";
+import { displayDialogue } from "./utils";
+import { CommonSetup } from "./CommonSetup";
 
-export class Game {
+export class Game extends CommonSetup {
     constructor() {
+        super();
+
         this.k = k;
         this.map = null;
         this.player = null;
@@ -13,35 +16,15 @@ export class Game {
         this.k.loadSprite("spritesheet", "./spritesheet.png", {
             sliceX: 39,
             sliceY: 31,
-            anims: {
-                "idle-down-player": 936,
-                "idle-side-player": 975,
-                "idle-up-player": 1014,
-                "idle-attack-side-player": 1093,
-                "idle-attack-down-player": 1092,
-                "idle-attack-up-player": 1094,
-                "walk-down-player": { from: 936, to: 939, loop: true, speed: 8 },
-                "walk-side-player": { from: 975, to: 978, loop: true, speed: 8 },
-                "walk-up-player": { from: 1014, to: 1017, loop: true, speed: 8 },
-
-                "idle-monster-attack": 14,
-                "monster-attack-side": { from: 1010, to: 1013, loop: true, speed: 8 },
-
-                "walk-down-frog": { from: 788, to: 789, loop: true, speed: 4 },
-                "walk-side-frog": { from: 790, to: 791, loop: true, speed: 4 },
-                "walk-up-frog": { from: 827, to: 828, loop: true, speed: 4 },
-                "walk-down-slime": { from: 858, to: 859, loop: true, speed: 4 },
-                "walk-side-slime": { from: 860, to: 861, loop: true, speed: 4 },
-                "walk-up-slime": { from: 897, to: 898, loop: true, speed: 4 },
-            },
+            anims: anims,
         });
     }
 
     scaleSetup() {
-        setCamScale(this.k);
+        super.setCamScale(this.k);
 
         this.k.onResize(() => {
-            setCamScale(this.k);
+            super.setCamScale(this.k);
         });
     }
 
@@ -83,7 +66,7 @@ export class Game {
         ]);
 
         enemy.add([
-            this.k.sprite("spritesheet", { anim: "idle-monster-attack" }),
+            this.k.sprite("spritesheet", { anim: "idle-attack-enemy" }),
             this.k.pos(),
             this.k.area(),
             {
@@ -190,45 +173,25 @@ export class Game {
         }
     }
 
-    handleCommonReleaseMove(obj) {
-        if (this.player.state === "attack") {
-            this.player.enterState("idle");
-        }
-
-        if (this.player.direction === "down") {
-            this.player.play(`idle-down-${obj}`);
-            return;
-        }
-
-        if (this.player.direction === "up") {
-            this.player.play(`idle-up-${obj}`);
-            return;
-        }
-        this.player.play(`idle-side-${obj}`);
-    }
-
+    // 플레이어 방향 설정
     handlePlayerMove(mouseBtn) {
-        // 좌클릭이 아니거나 다이얼로그가 띄어져 있다면 return
         if (mouseBtn !== "left" || this.player.isInDialogue) return;
 
-        // 마우스 좌표
         const worldMousePos = this.k.toWorld(this.k.mousePos());
         this.player.moveTo(worldMousePos, this.player.speed);
 
-        // 마우스 각도
         const mouseAngle = this.player.pos.angle(worldMousePos);
-        this.handleCommonMove(mouseAngle, this.player, "player");
+        super.handleCommonMove(mouseAngle, this.player, "player");
     }
 
+    // 몬스터 방향 설정
     handleMonsterMove(enemy, name) {
         const playerAngle = enemy.pos.angle(this.player.pos);
-        this.handleCommonMove(playerAngle, enemy, name);
+        super.handleCommonMove(playerAngle, enemy, name);
     }
 
     // 플레이어 공격상태 진입
-    handleAttack() {
-        this.player.enterState("attack");
-
+    handlePlayerAttack() {
         if (this.player.direction === "down") {
             this.player.play("idle-attack-down-player");
             return;
@@ -240,6 +203,21 @@ export class Game {
         }
 
         this.player.play("idle-attack-side-player");
+    }
+
+    // 플레이어 공격상태 진입
+    handleAttack(obj, name) {
+        if (obj.direction === "down") {
+            obj.play(`attack-down-${name}`);
+            return;
+        }
+
+        if (obj.direction === "up") {
+            obj.play(`attack-up-${name}`);
+            return;
+        }
+
+        obj.play(`attack-side-${name}`);
     }
 
     // enemies tag를 가진 모든 요소에 부딪힌 상태에서 attack 상태가 되었을 때
@@ -272,15 +250,15 @@ export class Game {
             });
 
             enemy.onStateUpdate("idle", () => {
-                enemy.play("walk-down-frog");
+                super.handleCommonReleaseMove(enemy, "frog");
             });
 
             enemy.onStateEnter("attack", () => {
-                enemy.children[0].play("monster-attack-side");
+                this.handleAttack(enemy.children[0], "enemy");
             });
 
             enemy.onStateEnd("attack", () => {
-                enemy.children[0].play("idle-monster-attack");
+                enemy.children[0].play("idle-attack-enemy");
             });
         }
 
@@ -303,48 +281,16 @@ export class Game {
             });
 
             enemy.onStateUpdate("idle", () => {
-                enemy.play("walk-down-slime");
+                super.handleCommonReleaseMove(enemy, "slime");
             });
 
             enemy.onStateEnter("attack", () => {
-                enemy.children[0].play("monster-attack-side");
+                this.handleAttack(enemy.children[0], "enemy");
             });
 
             enemy.onStateEnd("attack", () => {
-                enemy.children[0].play("idle-monster-attack");
+                enemy.children[0].play("idle-attack-enemy");
             });
-        }
-    }
-
-    // 상하 좌우 공통 움직임 처리
-    handleCommonMove(angle, obj, name) {
-        const lowerBound = 50;
-        const upperBound = 125;
-
-        if (angle > lowerBound && angle < upperBound && obj.curAnim() !== `walk-up-${name}`) {
-            obj.play(`walk-up-${name}`);
-            obj.direction = "up";
-            return;
-        }
-
-        if (angle < -lowerBound && angle > -upperBound && obj.curAnim() !== `walk-down-${name}`) {
-            obj.play(`walk-down-${name}`);
-            obj.direction = "down";
-            return;
-        }
-
-        if (Math.abs(angle) > upperBound) {
-            obj.flipX = false;
-            if (obj.curAnim() !== `walk-side-${name}`) obj.play(`walk-side-${name}`);
-            obj.direction = "right";
-            return;
-        }
-
-        if (Math.abs(angle) < lowerBound) {
-            obj.flipX = true;
-            if (obj.curAnim() !== `walk-side-${name}`) obj.play(`walk-side-${name}`);
-            obj.direction = "left";
-            return;
         }
     }
 

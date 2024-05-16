@@ -1,6 +1,5 @@
 import { Game } from "./Game";
 import { scaleFactor } from "./constants";
-import { setCamScale } from "./utils";
 
 export const loadYardScene = () => {
     const yard = new Game();
@@ -25,15 +24,15 @@ export const loadYardScene = () => {
         });
 
         yard.k.onMouseRelease(() => {
-            yard.handleCommonReleaseMove("player");
+            yard.handleCommonReleaseMove(yard.player, "player");
         });
 
         yard.k.onKeyPress("z", () => {
-            yard.handleAttack();
+            yard.handlePlayerAttack();
         });
 
         yard.k.onKeyRelease("z", () => {
-            yard.handleCommonReleaseMove("player");
+            yard.handleCommonReleaseMove(yard.player, "player");
         });
 
         yard.handleCommonCollide();

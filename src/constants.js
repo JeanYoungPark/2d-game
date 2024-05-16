@@ -19,3 +19,34 @@ export const dialogueData = {
     I probably only read one of them. Who else compulsively buys technical books without ever finishing them?`,
     exit: `If you want to exit JeanYoung's portfolio, just close the tab.`,
 };
+
+export const anims = {
+    "idle-down-player": 936,
+    "idle-side-player": 975,
+    "idle-up-player": 1014,
+    "idle-attack-side-player": 1093,
+    "idle-attack-down-player": 1092,
+    "idle-attack-up-player": 1094,
+    "walk-down-player": { from: 936, to: 939, loop: true, speed: 8 },
+    "walk-side-player": { from: 975, to: 978, loop: true, speed: 8 },
+    "walk-up-player": { from: 1014, to: 1017, loop: true, speed: 8 },
+
+    "idle-attack-enemy": 14,
+    "attack-side-enemy": { from: 1010, to: 1013, loop: true, speed: 8 },
+    "attack-down-enemy": { from: 1127, to: 1130, loop: true, speed: 8 },
+    "attack-up-enemy": { from: 1088, to: 1091, loop: true, speed: 8 },
+
+    "idle-down-frog": 788,
+    "idle-side-frog": 790,
+    "idle-up-frog": 827,
+    "walk-down-frog": { from: 788, to: 789, loop: true, speed: 4 },
+    "walk-side-frog": { from: 790, to: 791, loop: true, speed: 4 },
+    "walk-up-frog": { from: 827, to: 828, loop: true, speed: 4 },
+
+    "idle-down-slime": 858,
+    "idle-side-slime": 860,
+    "idle-up-slime": 897,
+    "walk-down-slime": { from: 858, to: 859, loop: true, speed: 4 },
+    "walk-side-slime": { from: 860, to: 861, loop: true, speed: 4 },
+    "walk-up-slime": { from: 897, to: 898, loop: true, speed: 4 },
+};

@@ -24,7 +24,7 @@ export const loadHomeScene = () => {
         });
 
         home.k.onMouseRelease(() => {
-            home.handleCommonReleaseMove("player");
+            home.handleCommonReleaseMove(home.player, "player");
         });
     });
 };
