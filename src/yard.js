@@ -29,7 +29,7 @@ export const loadYardScene = () => {
         });
 
         yard.k.onKeyPress("z", () => {
-            yard.handleSwordKeyPress();
+            yard.handleAttack();
         });
 
         yard.k.onKeyRelease("z", () => {
@@ -37,6 +37,7 @@ export const loadYardScene = () => {
         });
 
         yard.handleCommonCollide();
+        yard.handleMonsterState();
         yard.handleMonsterStateChange();
     });
 };
