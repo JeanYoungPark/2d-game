@@ -212,32 +212,36 @@ export class Game extends CommonSetup {
         let dirX = 0;
         let dirY = 0;
 
-        if (dir === "up") {
-            dirX = 0;
-            dirY = -1;
-            angle = "90";
-        }
+        const dirList = ["up", "down", "left", "right"];
 
-        if (dir === "down") {
-            dirX = 0;
-            dirY = 1;
-            angle = "-90";
-        }
+        if (dirList.includes(dir)) {
+            if (dir === "up") {
+                dirX = 0;
+                dirY = -1;
+                angle = "90";
+            }
 
-        if (dir === "right") {
-            dirX = 1;
-            dirY = 0;
-            angle = "180";
-        }
+            if (dir === "down") {
+                dirX = 0;
+                dirY = 1;
+                angle = "-90";
+            }
 
-        if (dir === "left") {
-            dirX = -1;
-            dirY = 0;
-            angle = "0";
-        }
+            if (dir === "right") {
+                dirX = 1;
+                dirY = 0;
+                angle = "180";
+            }
 
-        this.player.move(dirX * this.player.speed, dirY * this.player.speed);
-        super.handleCommonMove(angle, this.player, "player");
+            if (dir === "left") {
+                dirX = -1;
+                dirY = 0;
+                angle = "0";
+            }
+
+            this.player.move(dirX * this.player.speed, dirY * this.player.speed);
+            super.handleCommonMove(angle, this.player, "player");
+        }
     }
 
     // 몬스터 방향 설정
@@ -260,7 +264,9 @@ export class Game extends CommonSetup {
             return;
         }
 
-        this.player.play("idle-attack-side-player");
+        if (this.player.direction === "left" || this.player.direction === "right") {
+            this.player.play("idle-attack-side-player");
+        }
     }
 
     // 공격상태 진입

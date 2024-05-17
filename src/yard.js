@@ -19,24 +19,20 @@ export const loadYardScene = () => {
             yard.k.camPos(yard.player.pos.x, yard.player.pos.y + 100);
         });
 
-        yard.k.onMouseDown((mouseBtn) => {
-            yard.handlePlayerMove(mouseBtn);
-        });
+        // yard.k.onMouseDown((mouseBtn) => {
+        //     yard.handlePlayerMove(mouseBtn);
+        // });
 
-        yard.k.onMouseRelease(() => {
-            yard.handleCommonReleaseMove(yard.player, "player");
-        });
+        // yard.k.onMouseRelease(() => {
+        //     yard.handleCommonReleaseMove(yard.player, "player");
+        // });
 
-        yard.k.onKeyPress("z", () => {
-            yard.handlePlayerAttack();
-        });
-
-        yard.k.onKeyRelease("z", () => {
-            yard.handleCommonReleaseMove(yard.player, "player");
-        });
-
-        yard.k.onKeyDown((dir) => {
-            yard.handlePlayerMoveByKey(dir);
+        yard.k.onKeyDown((KeyCode) => {
+            if (KeyCode === "control") {
+                yard.handlePlayerAttack();
+            } else {
+                yard.handlePlayerMoveByKey(KeyCode);
+            }
         });
 
         yard.k.onKeyRelease(() => {

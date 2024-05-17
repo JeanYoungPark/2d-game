@@ -56,6 +56,8 @@ export class CommonSetup {
             return;
         }
 
-        obj.play(`idle-side-${name}`);
+        if (obj.direction === "left" || obj.direction == "right") {
+            obj.play(`idle-side-${name}`);
+        }
     }
 }

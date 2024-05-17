@@ -25,7 +25,13 @@ export function displayDialogue(text, onDisplayEnd) {
         dialogue.innerHTML = "";
         clearInterval(intervalRef);
         closeBtn.removeEventListener("click", onCloseBtnClick);
+        document.removeEventListener("keydown", onCloseBtnClick);
     }
 
     closeBtn.addEventListener("click", onCloseBtnClick);
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            onCloseBtnClick();
+        }
+    });
 }
