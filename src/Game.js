@@ -115,6 +115,26 @@ export class Game extends CommonSetup {
                 }
             }
 
+            if (layer.name == "npc") {
+                for (const entity of layer.objects) {
+                    this.map.add([
+                        this.k.area({
+                            shape: new this.k.Rect(this.k.vec2(0), entity.width, entity.height),
+                        }),
+                        this.k.body({ isStatic: true }),
+                        this.k.pos(entity.x, entity.y),
+                        entity.name,
+                    ]);
+
+                    if (entity.name) {
+                        this.player.onCollide(entity.name, () => {
+                            this.player.isInDialogue = true;
+                            displayDialogue(dialogueData[entity.name], () => (this.player.isInDialogue = false));
+                        });
+                    }
+                }
+            }
+
             if (layer.name === "frogs") {
                 for (const entity of layer.objects) {
                     const enemy = this.monsterSetup(entity);
@@ -192,6 +212,8 @@ export class Game extends CommonSetup {
 
     // 플레이어 공격상태 진입
     handlePlayerAttack() {
+        this.player.enterState("attack");
+
         if (this.player.direction === "down") {
             this.player.play("idle-attack-down-player");
             return;
@@ -205,7 +227,7 @@ export class Game extends CommonSetup {
         this.player.play("idle-attack-side-player");
     }
 
-    // 플레이어 공격상태 진입
+    // 공격상태 진입
     handleAttack(obj, name) {
         if (obj.direction === "down") {
             obj.play(`attack-down-${name}`);
@@ -229,68 +251,45 @@ export class Game extends CommonSetup {
         });
     }
 
+    handleEnemyMovement(enemy, name) {
+        enemy.onStateUpdate("move", () => {
+            this.handleMonsterMove(enemy, name);
+
+            let dirX = 1;
+            let dirY = 1;
+
+            if (this.player.pos.x < enemy.pos.x) {
+                dirX = -1;
+            }
+
+            if (this.player.pos.y < enemy.pos.y) {
+                dirY = -1;
+            }
+
+            enemy.move(100 * dirX, 100 * dirY);
+        });
+
+        enemy.onStateUpdate("idle", () => {
+            super.handleCommonReleaseMove(enemy, name);
+        });
+
+        enemy.onStateEnter("attack", () => {
+            this.handleAttack(enemy.children[0], "enemy");
+        });
+
+        enemy.onStateEnd("attack", () => {
+            enemy.children[0].play("idle-attack-enemy");
+        });
+    }
+
     // enemies 움직임 설정
     handleMonsterStateChange() {
         for (const enemy of this.frogs) {
-            enemy.onStateUpdate("move", () => {
-                this.handleMonsterMove(enemy, "frog");
-
-                let dirX = 1;
-                let dirY = 1;
-
-                if (this.player.pos.x < enemy.pos.x) {
-                    dirX = -1;
-                }
-
-                if (this.player.pos.y < enemy.pos.y) {
-                    dirY = -1;
-                }
-
-                enemy.move(100 * dirX, 100 * dirY);
-            });
-
-            enemy.onStateUpdate("idle", () => {
-                super.handleCommonReleaseMove(enemy, "frog");
-            });
-
-            enemy.onStateEnter("attack", () => {
-                this.handleAttack(enemy.children[0], "enemy");
-            });
-
-            enemy.onStateEnd("attack", () => {
-                enemy.children[0].play("idle-attack-enemy");
-            });
+            this.handleEnemyMovement(enemy, "frog");
         }
 
         for (const enemy of this.slimes) {
-            enemy.onStateUpdate("move", () => {
-                this.handleMonsterMove(enemy, "slime");
-
-                let dirX = 1;
-                let dirY = 1;
-
-                if (this.player.pos.x < enemy.pos.x) {
-                    dirX = -1;
-                }
-
-                if (this.player.pos.y < enemy.pos.y) {
-                    dirY = -1;
-                }
-
-                enemy.move(100 * dirX, 100 * dirY);
-            });
-
-            enemy.onStateUpdate("idle", () => {
-                super.handleCommonReleaseMove(enemy, "slime");
-            });
-
-            enemy.onStateEnter("attack", () => {
-                this.handleAttack(enemy.children[0], "enemy");
-            });
-
-            enemy.onStateEnd("attack", () => {
-                enemy.children[0].play("idle-attack-enemy");
-            });
+            this.handleEnemyMovement(enemy, "slime");
         }
     }
 
