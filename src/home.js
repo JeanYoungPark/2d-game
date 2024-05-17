@@ -26,5 +26,13 @@ export const loadHomeScene = () => {
         home.k.onMouseRelease(() => {
             home.handleCommonReleaseMove(home.player, "player");
         });
+
+        home.k.onKeyDown((dir) => {
+            home.handlePlayerMoveByKey(dir);
+        });
+
+        home.k.onKeyRelease(() => {
+            home.handleCommonReleaseMove(home.player, "player");
+        });
     });
 };

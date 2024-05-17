@@ -204,6 +204,42 @@ export class Game extends CommonSetup {
         super.handleCommonMove(mouseAngle, this.player, "player");
     }
 
+    // 플레이어 방향 설정 (키)
+    handlePlayerMoveByKey(dir) {
+        if (this.player.isInDialogue) return;
+
+        let angle = 0;
+        let dirX = 0;
+        let dirY = 0;
+
+        if (dir === "up") {
+            dirX = 0;
+            dirY = -1;
+            angle = "90";
+        }
+
+        if (dir === "down") {
+            dirX = 0;
+            dirY = 1;
+            angle = "-90";
+        }
+
+        if (dir === "right") {
+            dirX = 1;
+            dirY = 0;
+            angle = "180";
+        }
+
+        if (dir === "left") {
+            dirX = -1;
+            dirY = 0;
+            angle = "0";
+        }
+
+        this.player.move(dirX * this.player.speed, dirY * this.player.speed);
+        super.handleCommonMove(angle, this.player, "player");
+    }
+
     // 몬스터 방향 설정
     handleMonsterMove(enemy, name) {
         const playerAngle = enemy.pos.angle(this.player.pos);
@@ -255,15 +291,27 @@ export class Game extends CommonSetup {
         enemy.onStateUpdate("move", () => {
             this.handleMonsterMove(enemy, name);
 
-            let dirX = 1;
-            let dirY = 1;
+            let dirX = 0;
+            let dirY = 0;
 
             if (this.player.pos.x < enemy.pos.x) {
                 dirX = -1;
+                dirY = 0;
+            }
+
+            if (this.player.pos.x > enemy.pos.x) {
+                dirX = 1;
+                dirY = 0;
             }
 
             if (this.player.pos.y < enemy.pos.y) {
+                dirX = 0;
                 dirY = -1;
+            }
+
+            if (this.player.pos.y > enemy.pos.y) {
+                dirX = 0;
+                dirY = 1;
             }
 
             enemy.move(100 * dirX, 100 * dirY);

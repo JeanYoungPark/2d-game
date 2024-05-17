@@ -35,6 +35,14 @@ export const loadYardScene = () => {
             yard.handleCommonReleaseMove(yard.player, "player");
         });
 
+        yard.k.onKeyDown((dir) => {
+            yard.handlePlayerMoveByKey(dir);
+        });
+
+        yard.k.onKeyRelease(() => {
+            yard.handleCommonReleaseMove(yard.player, "player");
+        });
+
         yard.handleCommonCollide();
         yard.handleMonsterState();
         yard.handleMonsterStateChange();
