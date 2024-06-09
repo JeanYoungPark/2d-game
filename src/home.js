@@ -19,14 +19,6 @@ export const loadHomeScene = () => {
             home.k.camPos(home.player.pos.x, home.player.pos.y + 100);
         });
 
-        // home.k.onMouseDown((mouseBtn) => {
-        //     home.handlePlayerMove(mouseBtn);
-        // });
-
-        // home.k.onMouseRelease(() => {
-        //     home.handleCommonReleaseMove(home.player, "player");
-        // });
-
         home.k.onKeyDown((dir) => {
             home.handlePlayerMoveByKey(dir);
         });

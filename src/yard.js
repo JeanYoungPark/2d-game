@@ -3,7 +3,7 @@ import { scaleFactor } from "./constants";
 
 export const loadYardScene = () => {
     const yard = new Game();
-
+    ß;
     yard.k.scene("yard", async () => {
         yard.k.loadSprite("yard", "./yardMap.png");
         yard.k.setBackground(yard.k.Color.fromHex("#424E1E"));
@@ -18,14 +18,6 @@ export const loadYardScene = () => {
         yard.k.onUpdate(() => {
             yard.k.camPos(yard.player.pos.x, yard.player.pos.y + 100);
         });
-
-        // yard.k.onMouseDown((mouseBtn) => {
-        //     yard.handlePlayerMove(mouseBtn);
-        // });
-
-        // yard.k.onMouseRelease(() => {
-        //     yard.handleCommonReleaseMove(yard.player, "player");
-        // });
 
         yard.k.onKeyDown((KeyCode) => {
             if (KeyCode === "control") {

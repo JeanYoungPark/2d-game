@@ -193,22 +193,10 @@ export class Game extends CommonSetup {
         }
     }
 
-    // 플레이어 방향 설정
-    handlePlayerMove(mouseBtn) {
-        if (mouseBtn !== "left" || this.player.isInDialogue) return;
-
-        const worldMousePos = this.k.toWorld(this.k.mousePos());
-        this.player.moveTo(worldMousePos, this.player.speed);
-
-        const mouseAngle = this.player.pos.angle(worldMousePos);
-        super.handleCommonMove(mouseAngle, this.player, "player");
-    }
-
     // 플레이어 방향 설정 (키)
     handlePlayerMoveByKey(dir) {
         if (this.player.isInDialogue) return;
 
-        let angle = 0;
         let dirX = 0;
         let dirY = 0;
 
@@ -218,34 +206,31 @@ export class Game extends CommonSetup {
             if (dir === "up") {
                 dirX = 0;
                 dirY = -1;
-                angle = "90";
             }
 
             if (dir === "down") {
                 dirX = 0;
                 dirY = 1;
-                angle = "-90";
             }
 
             if (dir === "right") {
                 dirX = 1;
                 dirY = 0;
-                angle = "180";
             }
 
             if (dir === "left") {
                 dirX = -1;
                 dirY = 0;
-                angle = "0";
             }
 
             this.player.move(dirX * this.player.speed, dirY * this.player.speed);
-            super.handleCommonMove(angle, this.player, "player");
+            super.handleCommonMove(dir, this.player, "player");
         }
     }
 
     // 몬스터 방향 설정
     handleMonsterMove(enemy, name) {
+        // 문자로 변한 필요
         const playerAngle = enemy.pos.angle(this.player.pos);
         super.handleCommonMove(playerAngle, enemy, name);
     }

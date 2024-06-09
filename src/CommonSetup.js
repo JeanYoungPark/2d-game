@@ -1,8 +1,5 @@
 export class CommonSetup {
-    constructor() {
-        this.lowerBound = 50;
-        this.upperBound = 125;
-    }
+    constructor() {}
 
     // 카메라 위치
     setCamScale(k) {
@@ -16,32 +13,30 @@ export class CommonSetup {
     }
 
     // 상하 좌우 공통 움직임 처리
-    handleCommonMove(angle, obj, name) {
-        if (angle > this.lowerBound && angle < this.upperBound && obj.curAnim() !== `walk-up-${name}`) {
+    handleCommonMove(dir, obj, name) {
+        if (dir === "up" && obj.curAnim() !== `walk-up-${name}`) {
             obj.play(`walk-up-${name}`);
-            obj.direction = "up";
             return;
         }
 
-        if (angle < -this.lowerBound && angle > -this.upperBound && obj.curAnim() !== `walk-down-${name}`) {
+        if (dir === "down" && obj.curAnim() !== `walk-down-${name}`) {
             obj.play(`walk-down-${name}`);
-            obj.direction = "down";
             return;
         }
 
-        if (Math.abs(angle) > this.upperBound) {
+        if (dir === "right" && obj.curAnim() !== `walk-side-${name}`) {
             obj.flipX = false;
-            if (obj.curAnim() !== `walk-side-${name}`) obj.play(`walk-side-${name}`);
-            obj.direction = "right";
+            obj.play(`walk-side-${name}`);
             return;
         }
 
-        if (Math.abs(angle) < this.lowerBound) {
+        if (dir === "left" && obj.curAnim() !== `walk-side-${name}`) {
             obj.flipX = true;
-            if (obj.curAnim() !== `walk-side-${name}`) obj.play(`walk-side-${name}`);
-            obj.direction = "left";
+            obj.play(`walk-side-${name}`);
             return;
         }
+
+        obj.direction = dir;
     }
 
     // 액션이 끝났을 때 공통 움직임 처리
@@ -60,4 +55,6 @@ export class CommonSetup {
             obj.play(`idle-side-${name}`);
         }
     }
+
+    handleAngleToDir(anglr) {}
 }
