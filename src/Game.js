@@ -50,7 +50,7 @@ export class Game extends CommonSetup {
     }
 
     monsterSetup(entity) {
-        const enemy = this.k.add([
+        const enemy = this.k.make([
             this.k.sprite("spritesheet", { anim: `walk-down-${entity.name}` }),
             this.k.pos(this.k.vec2((this.map.pos.x + entity.x) * scaleFactor, (this.map.pos.y + entity.y) * scaleFactor)),
             this.k.area(),
@@ -73,6 +73,7 @@ export class Game extends CommonSetup {
                 layer: "objects",
             },
             `${entity.name}s`,
+            "additional-sprite",
         ]);
 
         return enemy;
@@ -138,6 +139,7 @@ export class Game extends CommonSetup {
             if (layer.name === "frogs") {
                 for (const entity of layer.objects) {
                     const enemy = this.monsterSetup(entity);
+                    this.k.add(enemy);
                     this.frogs.push(enemy); // constructor에서 배열 생성 필요
                 }
             }
@@ -145,6 +147,7 @@ export class Game extends CommonSetup {
             if (layer.name === "slimes") {
                 for (const entity of layer.objects) {
                     const enemy = this.monsterSetup(entity);
+                    this.k.add(enemy);
                     this.slimes.push(enemy); // constructor에서 배열 생성 필요
                 }
             }
@@ -193,22 +196,10 @@ export class Game extends CommonSetup {
         }
     }
 
-    // 플레이어 방향 설정
-    handlePlayerMove(mouseBtn) {
-        if (mouseBtn !== "left" || this.player.isInDialogue) return;
-
-        const worldMousePos = this.k.toWorld(this.k.mousePos());
-        this.player.moveTo(worldMousePos, this.player.speed);
-
-        const mouseAngle = this.player.pos.angle(worldMousePos);
-        super.handleCommonMove(mouseAngle, this.player, "player");
-    }
-
     // 플레이어 방향 설정 (키)
     handlePlayerMoveByKey(dir) {
         if (this.player.isInDialogue) return;
 
-        let angle = 0;
         let dirX = 0;
         let dirY = 0;
 
@@ -216,38 +207,31 @@ export class Game extends CommonSetup {
 
         if (dirList.includes(dir)) {
             if (dir === "up") {
-                dirX = 0;
                 dirY = -1;
-                angle = "90";
             }
 
             if (dir === "down") {
-                dirX = 0;
                 dirY = 1;
-                angle = "-90";
             }
 
             if (dir === "right") {
                 dirX = 1;
-                dirY = 0;
-                angle = "180";
             }
 
             if (dir === "left") {
                 dirX = -1;
-                dirY = 0;
-                angle = "0";
             }
 
             this.player.move(dirX * this.player.speed, dirY * this.player.speed);
-            super.handleCommonMove(angle, this.player, "player");
+            super.handleCommonMove(dir, this.player, "player");
         }
     }
 
     // 몬스터 방향 설정
     handleMonsterMove(enemy, name) {
         const playerAngle = enemy.pos.angle(this.player.pos);
-        super.handleCommonMove(playerAngle, enemy, name);
+        const dir = super.handleAngleToDir(playerAngle);
+        super.handleCommonMove(dir, enemy, name);
     }
 
     // 플레이어 공격상태 진입
@@ -264,24 +248,38 @@ export class Game extends CommonSetup {
             return;
         }
 
-        if (this.player.direction === "left" || this.player.direction === "right") {
-            this.player.play("idle-attack-side-player");
-        }
+        this.player.play("idle-attack-side-player");
     }
 
-    // 공격상태 진입
+    // enemy 공격상태 진입
     handleAttack(obj, name) {
-        if (obj.direction === "down") {
-            obj.play(`attack-down-${name}`);
+        const attackAction = obj.children[0];
+
+        if (obj.direction === "down" && attackAction.curAnim() !== `attack-down-${name}`) {
+            attackAction.pos = this.k.vec2(-5, 0);
+            attackAction.play(`attack-down-${name}`);
             return;
         }
 
-        if (obj.direction === "up") {
-            obj.play(`attack-up-${name}`);
+        if (obj.direction === "up" && attackAction.curAnim() !== `attack-up-${name}`) {
+            attackAction.pos = this.k.vec2(-5, -15);
+            attackAction.play(`attack-up-${name}`);
             return;
         }
 
-        obj.play(`attack-side-${name}`);
+        if (obj.direction === "right" && attackAction.curAnim() !== `attack-side-${name}`) {
+            attackAction.flipX = false;
+            attackAction.pos = this.k.vec2(0, -10);
+            attackAction.play(`attack-side-${name}`);
+            return;
+        }
+
+        if (obj.direction === "left" && attackAction.curAnim() !== `attack-side-${name}`) {
+            attackAction.flipX = true;
+            attackAction.pos = this.k.vec2(-15, -10);
+            attackAction.play(`attack-side-${name}`);
+            return;
+        }
     }
 
     // enemies tag를 가진 모든 요소에 부딪힌 상태에서 attack 상태가 되었을 때
@@ -290,6 +288,10 @@ export class Game extends CommonSetup {
             this.player.onStateEnter("attack", () => {
                 k.destroy(e);
             });
+        });
+
+        this.player.onCollide("additional-sprite", () => {
+            console.log("attack");
         });
     }
 
@@ -302,21 +304,17 @@ export class Game extends CommonSetup {
 
             if (this.player.pos.x < enemy.pos.x) {
                 dirX = -1;
-                dirY = 0;
             }
 
             if (this.player.pos.x > enemy.pos.x) {
                 dirX = 1;
-                dirY = 0;
             }
 
             if (this.player.pos.y < enemy.pos.y) {
-                dirX = 0;
                 dirY = -1;
             }
 
             if (this.player.pos.y > enemy.pos.y) {
-                dirX = 0;
                 dirY = 1;
             }
 
@@ -328,7 +326,8 @@ export class Game extends CommonSetup {
         });
 
         enemy.onStateEnter("attack", () => {
-            this.handleAttack(enemy.children[0], "enemy");
+            this.handleAttack(enemy, "enemy");
+            super.handleCommonMove(enemy.direction, enemy, name);
         });
 
         enemy.onStateEnd("attack", () => {
@@ -361,15 +360,18 @@ export class Game extends CommonSetup {
     }
 
     handleMonsterDir(enemy) {
-        if (this.player.pos.dist(enemy.pos) > 90 && this.player.pos.dist(enemy.pos) < 120) {
-            if (enemy.state !== "move") enemy.enterState("move");
-        }
-
-        if (this.player.pos.dist(enemy.pos) > 140) {
-            if (enemy.state !== "idle") enemy.enterState("idle");
-        }
-
-        if (this.player.pos.dist(enemy.pos) < 90) {
+        // 몬스터가 움직이는 플레이어와의 거리 조건
+        if (this.player.pos.dist(enemy.pos) >= 90 && this.player.pos.dist(enemy.pos) < 140) {
+            if (enemy.state !== "move") {
+                enemy.enterState("move");
+            }
+        } else if (this.player.pos.dist(enemy.pos) >= 140) {
+            // 몬스터가 멈추는 플레이어와의 거리 조건
+            if (enemy.state !== "idle") {
+                enemy.enterState("idle");
+            }
+        } else if (this.player.pos.dist(enemy.pos) < 90) {
+            // 몬스터가 공격하는 플레이어와의 거리 조건
             if (enemy.state !== "attack") {
                 enemy.enterState("attack");
             }

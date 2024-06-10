@@ -19,14 +19,6 @@ export const loadYardScene = () => {
             yard.k.camPos(yard.player.pos.x, yard.player.pos.y + 100);
         });
 
-        // yard.k.onMouseDown((mouseBtn) => {
-        //     yard.handlePlayerMove(mouseBtn);
-        // });
-
-        // yard.k.onMouseRelease(() => {
-        //     yard.handleCommonReleaseMove(yard.player, "player");
-        // });
-
         yard.k.onKeyDown((KeyCode) => {
             if (KeyCode === "control") {
                 yard.handlePlayerAttack();

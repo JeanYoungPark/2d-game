@@ -33,9 +33,9 @@ export const anims = {
     "walk-up-player": { from: 1014, to: 1017, loop: true, speed: 8 },
 
     "idle-attack-enemy": 14,
-    "attack-side-enemy": { from: 1010, to: 1013, loop: true, speed: 8 },
-    "attack-down-enemy": { from: 1127, to: 1130, loop: true, speed: 8 },
-    "attack-up-enemy": { from: 1088, to: 1091, loop: true, speed: 8 },
+    "attack-side-enemy": { from: 1010, to: 1013, loop: false, speed: 8 },
+    "attack-down-enemy": { from: 1127, to: 1130, loop: false, speed: 8 },
+    "attack-up-enemy": { from: 1088, to: 1091, loop: false, speed: 8 },
 
     "idle-down-frog": 788,
     "idle-side-frog": 790,
