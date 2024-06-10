@@ -3,7 +3,7 @@ import { scaleFactor } from "./constants";
 
 export const loadYardScene = () => {
     const yard = new Game();
-
+    ß;
     yard.k.scene("yard", async () => {
         yard.k.loadSprite("yard", "./yardMap.png");
         yard.k.setBackground(yard.k.Color.fromHex("#424E1E"));
